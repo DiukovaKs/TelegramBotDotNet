@@ -24,14 +24,14 @@ public class HttpService
             WeatherDto weatherData = JsonSerializer.Deserialize<WeatherDto>(responseString);
             return weatherData;
         }
-        catch (JsonException jsonEx)  // Исключения, связанные с JSON
+        catch (JsonException jsonEx)  //JSON exceptions
         {
-            Console.WriteLine($"Ошибка при десериализации JSON: {jsonEx.Message}");
+            Console.WriteLine($"Exceptions caused during JSON deserialization: {jsonEx.Message}");
             return null;
         }
-        catch (Exception ex)  // Ловим другие общие ошибки
+        catch (Exception ex)  // Other exceptions
         {
-            Console.WriteLine($"Произошла ошибка: {ex.Message}");
+            Console.WriteLine($"An error ocuured: {ex.Message}");
             return null;
         }
     }

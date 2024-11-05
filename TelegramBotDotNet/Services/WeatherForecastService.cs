@@ -8,12 +8,17 @@ public class WeatherForecastService
     private readonly ILogger<BotListener> _logger;
     private readonly HttpService _httpService;
     private readonly Mapper _mapper;
+    private readonly ForecastUrlBuilder _forecastUrlBuilder;
     
-    public WeatherForecastService(ILogger<BotListener> logger, HttpService httpService, Mapper mapper)
+    public WeatherForecastService(ILogger<BotListener> logger, 
+        HttpService httpService, 
+        Mapper mapper,
+        ForecastUrlBuilder forecastUrlBuilder)
     {
         _logger = logger;
         _httpService = httpService;
         _mapper = mapper;
+        _forecastUrlBuilder = forecastUrlBuilder;
     }
     
     public string GetWindForecastMessage(long chatId) {
@@ -50,8 +55,8 @@ public class WeatherForecastService
     private CurrentForecastDto GetCurrentWeather(long chatId) {
         WeatherDto dto;
 
-        string url = "https://api.open-meteo.com/v1/forecast?latitude=-41.2283&longitude=174.8702&hourly=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,uv_index&wind_speed_unit=ms&timezone=Pacific%2FAuckland&forecast_days=1";
-
+        string url = _forecastUrlBuilder.getDefaultURL();
+        
         dto = _httpService.FetchDataFromUrl(url).Result;
 
         return _mapper.ConvertToCurrentForecastDto(dto);

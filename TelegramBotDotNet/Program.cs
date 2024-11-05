@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpClient<HttpService>();
 builder.Services.AddSingleton<Mapper>();
+builder.Services.AddSingleton<ForecastUrlBuilder>();
 builder.Services.AddSingleton<TelegramBotClient>(sp =>
     new TelegramBotClient("7378936300:AAGfIrH1JNC21GklSW_r-O5z4_hg2-WTzgk"));
 builder.Services.AddSingleton<TelegramService>(sp =>

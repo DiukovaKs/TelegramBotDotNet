@@ -51,7 +51,41 @@ public class WeatherForecastService
 
         return forecastMessage;
     }
+
+    public string GetWeatherForecastMessage(long chatId)
+    {
+        string forecastMessage;
+        DateTime today = DateTime.Now;
+        string formattedDate = today.ToString("d MMMM", new System.Globalization.CultureInfo("en-UK"));
     
+        try
+        {
+            CurrentForecastDto dto = GetCurrentWeather(chatId);
+            
+            string header = string.Format("""
+                                          Weather forecast for Wellington {0} {1}
+                                          """, formattedDate, Environment.NewLine);
+
+            string lines = string.Format($"""
+                                           Time     Temp.°C      Hum. %       UV
+                                            8 AM      {dto.Temperature[0]}  {dto.WeatherCode[0]}        {dto.Humidity[0]}          {dto.UvIndex[0]}
+                                           12 PM      {dto.Temperature[1]}  {dto.WeatherCode[1]}        {dto.Humidity[1]}          {dto.UvIndex[1]}
+                                            4 PM      {dto.Temperature[2]}  {dto.WeatherCode[2]}        {dto.Humidity[2]}          {dto.UvIndex[2]}
+                                            8 PM      {dto.Temperature[3]}  {dto.WeatherCode[3]}        {dto.Humidity[3]}          {dto.UvIndex[3]}
+                                          """);
+
+            forecastMessage = header + lines;
+        }
+        catch (HttpRequestException ex)
+        {
+            forecastMessage = ex.ToString();
+        }
+        
+        _logger.LogDebug(forecastMessage);
+
+        return forecastMessage;
+    }
+
     private CurrentForecastDto GetCurrentWeather(long chatId) {
         WeatherDto dto;
 

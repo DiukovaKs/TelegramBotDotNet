@@ -44,7 +44,8 @@ public class BotListener
                     await botClient.SendTextMessageAsync(message.Chat.Id, windMessage);
                     break;
                 case "/weather":
-                    await botClient.SendTextMessageAsync(message.Chat.Id, "you send a weather request");
+                    string weatherMessage = _weatherForecastService.GetWeatherForecastMessage(message.Chat.Id);
+                    await botClient.SendTextMessageAsync(message.Chat.Id, weatherMessage);
                     break;
                 default:
                     await botClient.SendTextMessageAsync(message.Chat.Id, "I dont know this command!");

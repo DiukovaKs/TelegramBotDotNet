@@ -11,4 +11,5 @@ public class WeatherDto
     public HourlyDto hourly { get; set; }
     public HourlyUnitsDto hourly_units { get; set; }
    
+    public string city { get; set; }
 }

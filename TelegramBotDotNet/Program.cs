@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using TelegramBotDotNet.Mappers;
 using TelegramBotDotNet.Services;
@@ -11,8 +12,14 @@ builder.Services.AddSingleton<TelegramBotClient>(sp =>
     new TelegramBotClient("7378936300:AAGfIrH1JNC21GklSW_r-O5z4_hg2-WTzgk"));
 builder.Services.AddSingleton<TelegramService>(sp =>
     new TelegramService("7378936300:AAGfIrH1JNC21GklSW_r-O5z4_hg2-WTzgk", 123456789));
-builder.Services.AddSingleton<WeatherForecastService>();
 
+
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSingleton<ICityService, CityService>();
+builder.Services.AddSingleton<IChatToCityService, ChatToCityService>();
+builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<BotListener>();
 
 // Add services to the container.

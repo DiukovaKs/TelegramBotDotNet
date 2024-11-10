@@ -11,7 +11,7 @@ public class ForecastUrlBuilder
     {
     }
     
-    public string createForecastUrl(ForecastServiceUrlParametersDto parametersDto) {
+    public string CreateForecastUrl(ForecastServiceUrlParametersDto parametersDto) {
         string result;
 
         StringBuilder builder = new StringBuilder();
@@ -56,11 +56,11 @@ public class ForecastUrlBuilder
         return result;
     }
 
-    public String getDefaultURL() {
-        return createForecastUrl(getDefaultParameters());
+    public string GetDefaultURL() {
+        return CreateForecastUrl(GetDefaultParameters());
     }
 
-    public ForecastServiceUrlParametersDto getDefaultParameters() {
+    public ForecastServiceUrlParametersDto GetDefaultParameters() {
         HourlyParameters hourlyParameters = new HourlyParameters(true,
             true,
             true,
@@ -68,14 +68,14 @@ public class ForecastUrlBuilder
             true,
             true, 
             true);
-        
-        ForecastServiceUrlParametersDto parametersDto = new ForecastServiceUrlParametersDto("174.7756",
-            "-41.2866", 
-            hourlyParameters, 
-            "ms",
-            "Pacific/Auckland", 
-            1
-            );
+
+        ForecastServiceUrlParametersDto parametersDto = new ForecastServiceUrlParametersDto();
+        parametersDto.latitude = "174.7756";
+        parametersDto.longitude = "-41.2866";
+        parametersDto.hourlyParameters = hourlyParameters;
+        parametersDto.windSpeedUnit = "ms";
+        parametersDto.timezone = "Pacific/Auckland";
+        parametersDto.forecastDays = 1;
 
         return parametersDto;
     }

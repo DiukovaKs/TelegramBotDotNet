@@ -1,24 +1,35 @@
 ﻿using TelegramBotDotNet.DTOs;
+using TelegramBotDotNet.DTOs.Request;
+using TelegramBotDotNet.Entities;
 using TelegramBotDotNet.Mappers;
 
 namespace TelegramBotDotNet.Services;
 
 public class WeatherForecastService
 {
+    public const long DefaultCityId = 1L;
+    public const string DefaultCityName = "Wellington";
+    
     private readonly ILogger<BotListener> _logger;
     private readonly HttpService _httpService;
     private readonly Mapper _mapper;
     private readonly ForecastUrlBuilder _forecastUrlBuilder;
+    private readonly ICityService _cityService;
+    private readonly IChatToCityService _chatToCityService;
     
     public WeatherForecastService(ILogger<BotListener> logger, 
         HttpService httpService, 
         Mapper mapper,
-        ForecastUrlBuilder forecastUrlBuilder)
+        ForecastUrlBuilder forecastUrlBuilder,
+        ICityService cityService,
+        IChatToCityService chatToCityService)
     {
         _logger = logger;
         _httpService = httpService;
         _mapper = mapper;
         _forecastUrlBuilder = forecastUrlBuilder;
+        _cityService = cityService;
+        _chatToCityService = chatToCityService;
     }
     
     public string GetWindForecastMessage(long chatId) {
@@ -30,8 +41,8 @@ public class WeatherForecastService
             CurrentForecastDto dto = GetCurrentWeather(chatId);
 
             string header = string.Format("""
-                                          Wind forecast for Wellington {0} {1}
-                                          """, formattedDate, Environment.NewLine);
+                                          Wind forecast for {0} {1} {2}
+                                          """, dto.City, formattedDate, Environment.NewLine);
             string lines = string.Format("""
                                            8 AM      {0}      {1}  m/s
                                           12 PM      {2}      {3}  m/s
@@ -63,8 +74,8 @@ public class WeatherForecastService
             CurrentForecastDto dto = GetCurrentWeather(chatId);
             
             string header = string.Format("""
-                                          Weather forecast for Wellington {0} {1}
-                                          """, formattedDate, Environment.NewLine);
+                                          Weather forecast for {0} {1} {2}
+                                          """, dto.City, formattedDate, Environment.NewLine);
 
             string lines = string.Format($"""
                                            Time     Temp.°C      Hum. %       UV
@@ -87,12 +98,38 @@ public class WeatherForecastService
     }
 
     private CurrentForecastDto GetCurrentWeather(long chatId) {
-        WeatherDto dto;
-
-        string url = _forecastUrlBuilder.getDefaultURL();
+        WeatherDto? dto;
         
-        dto = _httpService.FetchDataFromUrl(url).Result;
+        if (chatId == null) {
+            dto = _httpService.FetchDataFromUrl(_forecastUrlBuilder.GetDefaultURL()).Result;
 
+            if (dto != null)
+            {
+                dto.city = DefaultCityName;
+            }
+           
+        } else {
+            var cityId = _chatToCityService.GetCityId(chatId);
+
+            if (cityId == null || cityId == 0) {
+                throw new NullReferenceException("Choose city previously", new NullReferenceException("ChatToCityTable is empty"));
+            }
+
+            CityEntity city = _cityService.GetCityByIdAsync(cityId).Result;
+
+            ForecastServiceUrlParametersDto parameters = _forecastUrlBuilder.GetDefaultParameters();
+            parameters.latitude = city.Latitude.Replace(',', '.');
+            parameters.longitude = city.Longitude.Replace(',', '.');
+
+            string url = _forecastUrlBuilder.CreateForecastUrl(parameters);
+
+            dto = _httpService.FetchDataFromUrl(url).Result;
+
+            if (dto != null) {
+                dto.city = city.City;
+            }
+        }
+      
         return _mapper.ConvertToCurrentForecastDto(dto);
     }
 }

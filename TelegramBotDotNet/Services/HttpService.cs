@@ -12,7 +12,7 @@ public class HttpService
         _client = new HttpClient();
     }
 
-    public async Task<WeatherDto> FetchDataFromUrl(string url)
+    public async Task<WeatherDto?> FetchDataFromUrl(string url)
     {
         try
         {
@@ -21,7 +21,7 @@ public class HttpService
             
             var responseString = await response.Content.ReadAsStringAsync();
             
-            WeatherDto weatherData = JsonSerializer.Deserialize<WeatherDto>(responseString);
+            WeatherDto? weatherData = JsonSerializer.Deserialize<WeatherDto>(responseString);
             return weatherData;
         }
         catch (JsonException jsonEx)  //JSON exceptions

@@ -26,6 +26,8 @@ public class Mapper
         newDto.WindSpeed = windSpeed;
         newDto.WindDirection = GetWindDirection(windDirection);
         newDto.UvIndex = uvIndex;
+        
+        newDto.City = weatherDto.city;
 
         return newDto;
     }
